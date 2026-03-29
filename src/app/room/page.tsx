@@ -13,8 +13,6 @@ import * as THREE from "three";
 import Navbar from "@/components/custom/navbar";
 import AnimatedSkyNoBirds from "@/components/custom/animated-sky-no-birds";
 
-/* ---------------- ROOM MODEL ---------------- */
-
 type RoomProps = {
   position: [number, number, number];
   rotation: [number, number, number];
@@ -115,7 +113,7 @@ function RoomModel({
   useFrame((state) => {
     if (!groupRef.current) return;
 
-    /* Hover scale */
+    // Smooth hover-scale interpolation.
     const targetScale = hovered && !disabled ? scale * 1.08 : scale;
 
     groupRef.current.scale.lerp(
@@ -123,7 +121,7 @@ function RoomModel({
       0.1
     );
 
-    /* Floating motion */
+    // Gentle floating motion to keep rooms feeling alive.
     groupRef.current.position.y =
       position[1] + Math.sin(state.clock.elapsedTime * 1.2) * 2;
   });
@@ -163,8 +161,6 @@ function RoomModel({
   );
 }
 
-/* ---------------- CAMERA CONTROLLER ---------------- */
-
 function CameraController({
   target,
   onArrive,
@@ -176,7 +172,7 @@ function CameraController({
 
   useFrame((state) => {
     if (!target) {
-      /* Idle cinematic drift */
+      // Subtle idle camera drift when no room is selected.
       camera.position.x += Math.sin(state.clock.elapsedTime * 0.2) * 0.008;
       camera.position.y += Math.cos(state.clock.elapsedTime * 0.15) * 0.008;
       return;
@@ -198,8 +194,6 @@ function CameraController({
 
   return null;
 }
-
-/* ---------------- SCENE ---------------- */
 
 function Scene({
   onRoomSelect,
@@ -264,8 +258,6 @@ function Scene({
   );
 }
 
-/* ---------------- MAIN PAGE ---------------- */
-
 export default function RoomGridPage() {
   const router = useRouter();
 
@@ -298,7 +290,6 @@ export default function RoomGridPage() {
         transition={{ duration: 0.8 }}
         className="w-screen h-screen relative overflow-hidden"
       >
-      {/* NAVBAR ANIMATION */}
       <motion.div
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -327,7 +318,6 @@ export default function RoomGridPage() {
         </Suspense>
       </Canvas>
 
-      {/* FADE OUT TRANSITION */}
       <AnimatePresence>
         {fade && (
           <motion.div
@@ -345,6 +335,4 @@ export default function RoomGridPage() {
     </>
   );
 }
-
-/* Preload model */
 useGLTF.preload("/models/rooms.glb");

@@ -40,7 +40,7 @@ export default function SearchPage() {
     }
   };
 
-  // 🔥 Auto search while typing
+  // Debounce live search while typing.
   useEffect(() => {
     const delay = setTimeout(() => {
       handleSearch();
@@ -83,7 +83,6 @@ export default function SearchPage() {
             Search the Library
           </h1>
 
-          {/* Search Bar */}
           <div className="flex items-center gap-4 mb-8">
             <div className="flex items-center flex-1 bg-white border-4 border-[#222222] rounded-2xl shadow-[6px_6px_0px_0px_#222222] px-6 py-4">
               <Search className="text-[#222222] mr-4" size={26} />

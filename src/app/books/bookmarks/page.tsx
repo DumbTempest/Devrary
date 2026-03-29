@@ -30,7 +30,7 @@ export default function BookmarksPage() {
   }, []);
 
   const removeBookmark = async (id: string) => {
-    // optimistic update
+    // Optimistic UI removal.
     setBookmarks((prev) => prev.filter((b) => b !== id));
 
     try {
@@ -71,14 +71,14 @@ export default function BookmarksPage() {
       } catch (err) {
         console.error("Failed to fetch books:", err);
       } finally {
-        setLoading(false); // ✅ DONE loading
+        setLoading(false);
       }
     };
 
     if (bookmarks.length > 0) {
       fetchBooks();
     } else {
-      setLoading(false); // no bookmarks → stop loading
+      setLoading(false);
     }
   }, [bookmarks]);
 

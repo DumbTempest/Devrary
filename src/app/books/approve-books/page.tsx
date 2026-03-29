@@ -38,7 +38,7 @@ export default function ApproveBooksPage() {
         }
     }, [status, session]);
 
-    // 🔐 AFTER hooks → safe to return
+    // Keep auth guard after hooks.
     if (status === "loading") {
         return <div className="h-screen flex items-center justify-center">Loading...</div>;
     }
@@ -51,7 +51,6 @@ export default function ApproveBooksPage() {
         );
     }
 
-    // ✅ Approve
     const handleApprove = async (id: string) => {
         await fetch("/api/books/approve", {
             method: "POST",
@@ -63,7 +62,6 @@ export default function ApproveBooksPage() {
         setSelected(null);
     };
 
-    // ❌ Reject
     const handleReject = async (id: string) => {
         await fetch("/api/books/reject", {
             method: "POST",
@@ -84,7 +82,6 @@ export default function ApproveBooksPage() {
             <div className="grid grid-cols-2 gap-10 mt-10">
                 <h1 className="text-4xl font-bold col-span-2 mb-6">Admin Panel</h1>
 
-                {/* LEFT: LIST */}
                 <div className="space-y-4">
                     <h1 className="text-3xl font-bold">Draft Books</h1>
 
@@ -112,7 +109,6 @@ export default function ApproveBooksPage() {
                     ))}
                 </div>
 
-                {/* RIGHT: PREVIEW */}
                 <div>
                     {selected ? (
                         <div className="space-y-6">

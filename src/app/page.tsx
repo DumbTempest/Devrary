@@ -11,7 +11,6 @@ import Navbar from "@/components/custom/navbar";
 import AnimatedSkyNoBirds from "@/components/custom/animated-sky-no-birds";
 import { AnimatePresence, motion } from "framer-motion";
 import MainPageModal from "../components/custom/mainpagemodal";
-//import Footer from "@/components/custom/footer";
 
 const EASE = "easeOut" as const;
 

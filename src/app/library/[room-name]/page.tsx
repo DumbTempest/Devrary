@@ -22,7 +22,6 @@ const techStack = [
     { name: "Python", color: "#3776AB" },
 ];
 
-/* ---------------- CAMERA CONTROLLER ---------------- */
 function CameraController({
     target,
     isZoomed,
@@ -152,8 +151,6 @@ export default function Home() {
         <>
             <AnimatedSkyNoBirds />
             <main className="absolute h-screen w-screen overflow-hidden">
-
-                {/* Back Button */}
                 <div className="absolute bottom-0 right-0 mb-10 mr-10 z-50">
                     <Button
                         onClick={handleSmartBack}
@@ -163,7 +160,6 @@ export default function Home() {
                     </Button>
                 </div>
 
-                {/* Room Title */}
                 <div className="absolute top-6 left-8 z-50 pointer-events-none">
                     <h1 className="text-white text-3xl font-semibold tracking-wide drop-shadow-lg font-tektur">
                         {roomDisplayName}
@@ -216,7 +212,6 @@ export default function Home() {
                     />
                 </Canvas>
 
-                {/* Book Index Panel */}
                 {selectedIndex !== null && (
                     <BookIndexPanel
                         books={currentShelfBooks}
@@ -224,11 +219,10 @@ export default function Home() {
                     />
                 )}
 
-                {/* Book Overlay */}
                 <AnimatePresence>
                     {activeBookId && (
                         <>
-                            {/* Transparent backdrop — only blocks pointer events to canvas below */}
+                            {/* Keep canvas interactions blocked while modal is open. */}
                             <motion.div
                                 key="backdrop"
                                 initial={{ opacity: 0 }}
@@ -245,7 +239,6 @@ export default function Home() {
                                 exit={{ opacity: 0, scale: 0.92, y: 24 }}
                                 className="absolute z-50 inset-0 flex items-center justify-center pointer-events-none"
                             >
-                                {/* ↓ No backgroundColor — fully transparent modal */}
                                 <div
                                     className="relative w-[95%] h-[95%] rounded-2xl overflow-hidden pointer-events-auto"
                                     onClick={(e) => e.stopPropagation()}
