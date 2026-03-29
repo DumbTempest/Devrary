@@ -14,7 +14,7 @@ export default function ApproveBooksPage() {
     const [selected, setSelected] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
-    // ✅ ALWAYS run hooks
+
     useEffect(() => {
         if (status !== "authenticated") return;
 
@@ -82,6 +82,7 @@ export default function ApproveBooksPage() {
                 <Navbar />
 
             <div className="grid grid-cols-2 gap-10 mt-10">
+                <h1 className="text-4xl font-bold col-span-2 mb-6">Admin Panel</h1>
 
                 {/* LEFT: LIST */}
                 <div className="space-y-4">
