@@ -104,6 +104,7 @@ const BOOK_H = 700;
 const ZOOM_STEP = 0.1;
 const ZOOM_MIN = 0.3;
 const ZOOM_MAX = 2.0;
+const PROGRESS_KEY = "devrary:reading-progress";
 
 /* ── Reusable neobrutalist button ── */
 const NeoButton = ({
@@ -237,6 +238,40 @@ export default function Flipbook({
     };
     fetchBookData();
   }, [bookId]);
+
+  useEffect(() => {
+    if (!bookMeta) return;
+
+    try {
+      const raw = localStorage.getItem(PROGRESS_KEY);
+      const progressMap = raw ? JSON.parse(raw) : {};
+      const saved = progressMap?.[bookId];
+      const savedPage = Number(saved?.pageIndex);
+
+      if (!Number.isFinite(savedPage) || savedPage <= 0) return;
+
+      const maxPage = Math.max(0, (bookMeta.pages?.length || 0) + 1);
+      const targetPage = Math.min(savedPage, maxPage);
+
+      const timer = setTimeout(() => {
+        const pageFlip = flipBookRef.current?.pageFlip?.();
+        if (!pageFlip) return;
+
+        if (typeof pageFlip.turnToPage === "function") {
+          pageFlip.turnToPage(targetPage);
+          return;
+        }
+
+        if (typeof pageFlip.flip === "function") {
+          pageFlip.flip(targetPage);
+        }
+      }, 100);
+
+      return () => clearTimeout(timer);
+    } catch (error) {
+      console.warn("Failed to restore reading progress", error);
+    }
+  }, [bookId, bookMeta]);
 
   if (!bookMeta) {
     return (
@@ -382,6 +417,19 @@ export default function Flipbook({
             setCurrentPage(e.data);
             speechSynthesis.cancel();
             setSpeaking(false);
+
+            try {
+              const raw = localStorage.getItem(PROGRESS_KEY);
+              const progressMap = raw ? JSON.parse(raw) : {};
+              progressMap[bookId] = {
+                pageIndex: e.data,
+                totalPages,
+                updatedAt: Date.now(),
+              };
+              localStorage.setItem(PROGRESS_KEY, JSON.stringify(progressMap));
+            } catch (error) {
+              console.warn("Failed to save reading progress", error);
+            }
           }}
         >
           <Cover

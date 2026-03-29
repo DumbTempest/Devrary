@@ -36,12 +36,24 @@ const transition = (delay = 0, duration = 0.5) => ({
   ease: EASE,
 });
 
+const RECENTLY_VIEWED_KEY = "devrary:recently-viewed";
+const PROGRESS_KEY = "devrary:reading-progress";
+
+type RecentBook = {
+  bookId: string;
+  roomSlug?: string;
+  shelf?: number;
+  viewedAt: number;
+};
+
 export default function Home() {
   const { data: session, status } = useSession();
   const [isHoveringBook, setIsHoveringBook] = useState(false);
   const [showThoughtBubble, setShowThoughtBubble] = useState(false);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [hoveredBookKey, setHoveredBookKey] = useState<string | null>(null);
+  const [recentlyViewed, setRecentlyViewed] = useState<RecentBook[]>([]);
+  const [progressMap, setProgressMap] = useState<Record<string, { pageIndex: number; totalPages?: number }>>({});
   const [activeQuote, setActiveQuote] = useState({
     command: "git status",
     description: "Shows changed, staged, and untracked files in your working tree.",
@@ -134,6 +146,20 @@ export default function Home() {
     return () => clearInterval(rotateTimer);
   }, [showThoughtBubble, hoveredBookKey]);
 
+  useEffect(() => {
+    try {
+      const rawRecent = localStorage.getItem(RECENTLY_VIEWED_KEY);
+      const parsedRecent = rawRecent ? JSON.parse(rawRecent) : [];
+      setRecentlyViewed(Array.isArray(parsedRecent) ? parsedRecent.slice(0, 3) : []);
+
+      const rawProgress = localStorage.getItem(PROGRESS_KEY);
+      const parsedProgress = rawProgress ? JSON.parse(rawProgress) : {};
+      setProgressMap(parsedProgress && typeof parsedProgress === "object" ? parsedProgress : {});
+    } catch (error) {
+      console.warn("Failed to load continue reading data", error);
+    }
+  }, []);
+
   return (
     <>
       <AnimatedSkyNoBirds />
@@ -195,6 +221,39 @@ export default function Home() {
                   Walk through domains, browse languages, and open curated resources
                   designed to make learning clear and accessible.
                 </p>
+
+                {recentlyViewed.length > 0 && (
+                  <div className="mb-8">
+                    <h2 className="text-lg font-bold text-[#222222] mb-3">
+                      Continue Reading
+                    </h2>
+
+                    <div className="space-y-3">
+                      {recentlyViewed.map((item) => {
+                        const shelf = item.shelf || 1;
+                        const room = item.roomSlug || "web-dev";
+                        const progress = progressMap[item.bookId];
+                        const current = Number(progress?.pageIndex || 0);
+                        const total = Number(progress?.totalPages || 0);
+                        const percent = total > 0 ? Math.max(0, Math.min(100, Math.round((current / total) * 100))) : 0;
+
+                        return (
+                          <Link
+                            key={item.bookId}
+                            href={`/library/${room}?shelf=${shelf}&bookId=${item.bookId}`}
+                            className="block"
+                          >
+                            <div className="bg-white border-2 border-[#222222] rounded-xl px-4 py-3 shadow-[4px_4px_0px_0px_#222222] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
+                              <p className="text-sm font-bold text-[#222222] truncate">{item.bookId}</p>
+                              <p className="text-xs text-[#222222]/80 mt-1">Progress: {percent}%</p>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <Link href="/room">
                   <motion.div
                     whileHover={{ scale: 1.08 }}

@@ -12,6 +12,8 @@ import Flipbook from "../../../components/custom/flippage";
 import { Button } from "@/components/ui/button";
 import AnimatedSkyNoBirds from "@/components/custom/animated-sky-no-birds";
 
+const RECENTLY_VIEWED_KEY = "devrary:recently-viewed";
+
 
 const techStack = [
     { name: "JavaScript", color: "#f7df1e" },
@@ -113,6 +115,31 @@ export default function Home() {
     const handleBookOpen = useCallback((bookId: string, color: string) => {
         setOverlayColor(color);
         setActiveBookId(bookId);
+
+        try {
+            const inferredShelf = Number(bookId.split("-").at(-1));
+            const fallbackShelf = Number.isFinite(inferredShelf) ? inferredShelf + 1 : 1;
+            const shelf = shelfFromUrl ? Number(shelfFromUrl) : fallbackShelf;
+
+            const raw = localStorage.getItem(RECENTLY_VIEWED_KEY);
+            const recent = raw ? JSON.parse(raw) : [];
+            const nextEntry = {
+                bookId,
+                roomSlug,
+                shelf,
+                viewedAt: Date.now(),
+            };
+
+            const deduped = [
+                nextEntry,
+                ...recent.filter((entry: { bookId: string }) => entry.bookId !== bookId),
+            ].slice(0, 10);
+
+            localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(deduped));
+        } catch (error) {
+            console.warn("Failed to persist recently viewed book", error);
+        }
+
         if (shelfFromUrl) {
             router.push(`/library/${roomSlug}?shelf=${shelfFromUrl}&bookId=${bookId}`);
         }
