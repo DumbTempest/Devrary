@@ -225,7 +225,3 @@ Open http://localhost:3000.
 2. Configure Google OAuth callback URLs for the deployed domain.
 3. Ensure MongoDB Atlas Search index search exists for the books collection.
 4. Run production build and smoke test protected routes.
-
----
-
-If you want, the next improvement can be an API reference section with example request/response payloads for each endpoint.
