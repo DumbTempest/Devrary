@@ -8,7 +8,7 @@ Devrary maps learning into a spatial library model:
 
 - Room: domain view and navigation
 - Shelf: technology/language grouping
-- Book: concept entry
+- Book: concept entry book
 - Page: structured content sections
 
 Users can browse rooms, open shelves, search books, bookmark books, and create draft books. Admin users can approve or reject submitted drafts.
