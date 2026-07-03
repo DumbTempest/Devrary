@@ -2,7 +2,7 @@
 
 A 3D virtual software-learning library built with Next.js App Router, NextAuth, MongoDB, and React Three Fiber.
 
-## What This Project Does
+## What This Project Does:
 
 Devrary maps learning into a spatial library model:
 
