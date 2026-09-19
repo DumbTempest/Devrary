@@ -20,12 +20,12 @@ const PRESET_TAGS = [
     "linux", "bash", "git", "github", "open-source", "system-design", "scalability", "microservices", "event-driven", "architecture"
 ];
 
-type SectionType = "text" | "highlight" | "list";
+type BookSection =
+    | { type: "text"; content: string }
+    | { type: "highlight"; content: string }
+    | { type: "list"; content: string[] };
 
-type BookSection = {
-    type: SectionType;
-    content: string;
-};
+type SectionType = BookSection["type"];
 
 type BookPage = {
     title: string;
@@ -101,13 +101,35 @@ export default function CreatePage() {
     };
 
     const updateSection = (pIndex: number, sIndex: number, key: "type" | "content", value: string) => {
-        const updated = [...pages];
-        if (key === "type") {
-            updated[pIndex].sections[sIndex].type = value as SectionType;
-        } else {
-            updated[pIndex].sections[sIndex].content = value;
-        }
-        setPages(updated);
+        setPages((currentPages) => currentPages.map((page, pageIndex) => {
+            if (pageIndex !== pIndex) return page;
+
+            return {
+                ...page,
+                sections: page.sections.map((section, sectionIndex): BookSection => {
+                    if (sectionIndex !== sIndex) return section;
+
+                    if (key === "content") {
+                        return section.type === "list"
+                            ? { ...section, content: value.split("\n") }
+                            : { ...section, content: value };
+                    }
+
+                    const nextType = value as SectionType;
+                    if (nextType === "list") {
+                        return {
+                            type: "list",
+                            content: section.type === "list" ? section.content : section.content ? [section.content] : [],
+                        };
+                    }
+
+                    return {
+                        type: nextType,
+                        content: section.type === "list" ? section.content.join("\n") : section.content,
+                    };
+                }),
+            };
+        }));
     };
 
     const handleSubmit = async () => {
@@ -598,7 +620,7 @@ export default function CreatePage() {
                                             </select>
 
                                             <input
-                                                value={section.content}
+                                                value={section.type === "list" ? section.content.join("\n") : section.content}
                                                 onChange={(e) => updateSection(pIndex, sIndex, "content", e.target.value)}
                                                 className="
                       flex-1 px-4 py-2.5 text-sm font-semibold text-[#222]
@@ -609,7 +631,7 @@ export default function CreatePage() {
                       focus:outline-none focus:shadow-none focus:translate-x-[1px] focus:translate-y-[1px]
                       transition-all duration-100
                     "
-                                                placeholder="Content..."
+                                                placeholder={section.type === "list" ? "One item per line..." : "Content..."}
                                             />
                                         </div>
                                     ))}
